@@ -110,3 +110,14 @@ klist
 
 You can add users or adjust passwords in `start-kdc.sh`.
 
+To create a keytab file for the user:
+```
+ktutil
+# inside ktutil
+ktutil:  addent -password -p enduser@EXAMPLE.COM -k 1 -e aes256-cts-hmac-sha1-96
+Password for enduser@EXAMPLE.COM: 
+ktutil:  addent -password -p enduser@EXAMPLE.COM -k 1 -e aes128-cts-hmac-sha1-96
+Password for enduser@EXAMPLE.COM: 
+ktutil:  wkt enduser.keytab
+```
+Depending on your OS, you may need to add additional encryption types (`-e` flag).
