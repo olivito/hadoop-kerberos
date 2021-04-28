@@ -1,6 +1,10 @@
 version: "2"
 services:
   kerberos:
+    ports:
+      - 88:88/udp
+      - 88:88/tcp
+      - 749:749
     container_name: kerberos.example
     hostname: kerberos.example.com
     entrypoint: /start-kdc.sh
@@ -15,6 +19,7 @@ services:
   nn:
     ports:
       - 9000:9000
+      - 50070:50070
     container_name: nn.example
     hostname: nn.example.com
     user: hdfs
@@ -29,6 +34,8 @@ services:
       - /hadoop
 
   dn1:
+    ports:
+      - 50075:50075
     container_name: dn1.example
     hostname: dn1.example.com
     user: hdfs
@@ -46,6 +53,22 @@ services:
     hostname: data-populator.example.com
     user: hdfs
     entrypoint: /populate-data.sh
+    build:
+      context: .
+      args:
+        - http_proxy
+        - https_proxy
+    volumes:
+      - server-keytab:/var/keytabs
+
+  hive:
+    ports:
+      - 10000:10000
+      - 10002:10002
+    container_name: hive.example
+    hostname: hive.example.com
+    user: hive
+    entrypoint: /start-hive.sh
     build:
       context: .
       args:

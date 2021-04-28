@@ -4,13 +4,15 @@
 docker container rm dn1.example -f
 docker container rm nn.example -f
 docker container rm kerberos.example -f
-docker container rm datapopulator.example -f
+docker container rm data-populator.example -f
+docker container rm hive.example -f
 
 ## TEAR DOWN IMAGES
-docker rmi hadoopkerberos_dn1 --force
-docker rmi hadoopkerberos_nn --force
-docker rmi hadoopkerberos_kerberos --force
-docker rmi hadoopkerberos_datapopulator --force
+docker rmi hadoop-kerberos_dn1 --force
+docker rmi hadoop-kerberos_nn --force
+docker rmi hadoop-kerberos_kerberos --force
+docker rmi hadoop-kerberos_data-populator --force
+docker rmi hadoop-kerberos_hive --force
 
 ## TEAR DOWN VOLUME (THIS IS IMPORTANT FOR NEW KEYTABS)
-docker volume rm hadoopkerberos_server-keytab
+docker volume rm hadoop-kerberos_server-keytab

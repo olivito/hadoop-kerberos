@@ -17,5 +17,9 @@ hdfs dfs -copyFromLocal /people.txt /user/ifilonenko
 hdfs dfs -chmod -R 755 /user/ifilonenko
 hdfs dfs -chown -R ifilonenko /user/ifilonenko
 
+hadoop fs -mkdir /tmp
+hadoop fs -mkdir -p /user/hive/warehouse
+hadoop fs -chmod a+w /tmp
+hadoop fs -chown -R hive /user/hive
 
 sleep 60
