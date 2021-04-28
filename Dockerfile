@@ -7,7 +7,7 @@ RUN yum install net-tools -y
 RUN yum install telnet telnet-server -y
 RUN yum -y install which
 
-RUN sed -i -e 's/#//' -e 's/default_ccache_name/# default_ccache_name/' /etc/krb5.conf
+RUN sed -i -e 's/#//' -e 's/default_ccache_name/# default_ccache_name/' -e 's/renew_lifetime/# renew_lifetime/' /etc/krb5.conf
 
 RUN useradd -u 1098 hdfs
 
