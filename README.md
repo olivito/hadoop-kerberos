@@ -3,58 +3,75 @@
 
 Hadoop requires reverse DNS.  Under docker-compose, we require an external network named "com" for hosts to resolve forward and backwards.
 
-```
-docker network create com
+```bash
+sudo docker network create com
 ```
 
 #### 2. Download a distro of Hadoop and Hive
 
-```
+If these links don't work, you may need to navigate to the root
+directory in your browser and find a newer version.
+
+Copy these files into the `hadoop-kerberos` directory:
+```bash
 wget https://archive.apache.org/dist/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
-wget https://apache.osuosl.org/hive/hive-2.3.8/apache-hive-2.3.8-bin.tar.gz
+wget https://apache.osuosl.org/hive/hive-2.3.9/apache-hive-2.3.9-bin.tar.gz
 ```
 
 #### 3. Start it up
 
-```
-docker volume rm hadoopkerberos_server-keytab
-docker-compose up -d --force-recreate --build
+```bash
+sudo docker volume rm hadoopkerberos_server-keytab
+sudo docker-compose up -d --force-recreate --build
 ```
 
 To shut down:
-```
+```bash
 chmod a+x teardown.sh
-./teardown.sh
+sudo ./teardown.sh
 ```
 
 Or:
-```
-docker-compose down
-docker volume rm hadoopkerberos_server-keytab
+```bash
+sudo docker-compose down
+sudo docker volume rm hadoopkerberos_server-keytab
 ```
 
 It is important to remove the volume `hadoopkerberos_server-keytab` each time you restart.
 Otherwise old entries will be present in the keytab files and prevent authentication.
+If you have run multiple times, you may need to also prune stale
+Docker volumes:
+
+```bash
+sudo docker volume prune
+```
+
 
 #### 4. Run HDFS commands to test
 
 This confirms that the `hdfs` principal can run `ls`.
 
-```
-docker exec -it nn.example /bin/bash
+```bash
+sudo docker exec -it nn.example /bin/bash
 kinit -kt /var/keytabs/hdfs.keytab hdfs/nn.example.com
 hdfs dfs -ls /
 ```
+
+If `kinit` fails to get credentials, likely you have a stale volume
+for `hadoopkerberos_server-keytab`.  See the Shut Down instructions above.
 
 #### 5. Run Hive commands
 
 This creates a table `pokes` using an example file.
 
-```
-docker exec -it hive.example /bin/bash
+```bash
+sudo docker exec -it hive.example /bin/bash
 kinit hive/hive.example.com@EXAMPLE.COM -kt /var/keytabs/hive.keytab
 /hive/bin/beeline -u "jdbc:hive2://hive.example.com:10000/default;principal=hive/hive.example.com@EXAMPLE.COM"
-# in beeline
+```
+
+Then in beeline:
+```
 CREATE TABLE pokes (foo INT, bar STRING);
 LOAD DATA LOCAL INPATH '/hive/examples/files/kv1.txt' OVERWRITE INTO TABLE pokes;
 SELECT * FROM pokes LIMIT 5;
@@ -64,7 +81,7 @@ exit
 #### To authenticate using kerberos from another host
 
 Install kerberos user client.  On Ubuntu:
-```
+```bash
 sudo apt-get install krb5-user
 ```
 
@@ -74,7 +91,7 @@ xx.yy.zz.qq kerberos.example.com hive.example.com
 ```
 
 Verify that you can ping the host:
-```
+```bash
 ping kerberos.example.com
 ```
 
