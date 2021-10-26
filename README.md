@@ -1,5 +1,8 @@
-### Bloomberg Big Data and NoSQL Platform
-#### 1. Configure Docker networking
+# HDFS / Hive / Kerberos Example
+
+This example creates a HDFS / Hive / Kerberos working setup using docker-compose.
+
+## 1. Configure Docker networking
 
 Hadoop requires reverse DNS.  Under docker-compose, we require an external network named "com" for hosts to resolve forward and backwards.
 
@@ -7,7 +10,7 @@ Hadoop requires reverse DNS.  Under docker-compose, we require an external netwo
 sudo docker network create com
 ```
 
-#### 2. Download a distro of Hadoop and Hive
+## 2. Download a distro of Hadoop and Hive
 
 If these links don't work, you may need to navigate to the root
 directory in your browser and find a newer version.
@@ -18,36 +21,18 @@ wget https://archive.apache.org/dist/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar
 wget https://apache.osuosl.org/hive/hive-2.3.9/apache-hive-2.3.9-bin.tar.gz
 ```
 
-#### 3. Start it up
+## 3. Start it up
 
 ```bash
 sudo docker volume rm hadoopkerberos_server-keytab
 sudo docker-compose up -d --force-recreate --build
 ```
 
-To shut down:
-```bash
-chmod a+x teardown.sh
-sudo ./teardown.sh
-```
+It is important to remove the volume `hadoopkerberos_server-keytab`
+each time you restart.
+See the Shut Down instructions below.
 
-Or:
-```bash
-sudo docker-compose down
-sudo docker volume rm hadoopkerberos_server-keytab
-```
-
-It is important to remove the volume `hadoopkerberos_server-keytab` each time you restart.
-Otherwise old entries will be present in the keytab files and prevent authentication.
-If you have run multiple times, you may need to also prune stale
-Docker volumes:
-
-```bash
-sudo docker volume prune
-```
-
-
-#### 4. Run HDFS commands to test
+## 4. Run HDFS commands to test
 
 This confirms that the `hdfs` principal can run `ls`.
 
@@ -60,7 +45,7 @@ hdfs dfs -ls /
 If `kinit` fails to get credentials, likely you have a stale volume
 for `hadoopkerberos_server-keytab`.  See the Shut Down instructions above.
 
-#### 5. Run Hive commands
+## 5. Run Hive commands
 
 This creates a table `pokes` using an example file.
 
@@ -78,7 +63,32 @@ SELECT * FROM pokes LIMIT 5;
 exit
 ```
 
-#### To authenticate using kerberos from another host
+## 6. Shut Down / Restart
+
+To shut down:
+```bash
+chmod a+x teardown.sh
+sudo ./teardown.sh
+```
+
+Or:
+```bash
+sudo docker-compose down
+sudo docker volume rm hadoopkerberos_server-keytab
+```
+
+Otherwise old entries will be present in the keytab files and prevent authentication.
+If you have run multiple times, you may need to also prune stale
+Docker volumes:
+
+```bash
+sudo docker volume prune
+```
+
+To restart, use the commands in Step 3.
+
+
+# To authenticate using kerberos from another host
 
 Install kerberos user client.  On Ubuntu:
 ```bash
